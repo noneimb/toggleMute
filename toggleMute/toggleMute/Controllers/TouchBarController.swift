@@ -20,6 +20,7 @@ class TouchBarController {
     let imageUnmute = NSImage(named: NSImage.touchBarAudioInputTemplateName)
     let imageMute = NSImage(named: NSImage.touchBarAudioInputMuteTemplateName)
     var touchBarButton: NSButton?
+    var currentToggleSound: NSSound?
 
     
     private lazy var item: NSCustomTouchBarItem = {
@@ -105,6 +106,7 @@ class TouchBarController {
         redIcon = defaults.bool(forKey: "redMenuBarIcon")
         
         if(!setMute && isMuted){
+            currentToggleSound?.stop()
             defaults.set(false, forKey: "isMuted")
             button?.image = imageUnmute
             button?.layer?.backgroundColor = CGColor(red: 0, green: 0, blue: 0 , alpha: 0)
@@ -115,7 +117,12 @@ class TouchBarController {
                 unmuteVal = defaults.integer(forKey: "defaultInputVol")
             }
             setNewVolume(newValue: unmuteVal)
+            if let sound = NSSound(named: "Glass") {
+                sound.play()
+                currentToggleSound = sound
+            }
         } else if(setMute && !isMuted) {
+            currentToggleSound?.stop()
             defaults.set(true, forKey: "isMuted")
             button?.image = imageMute
             if(redIcon){
@@ -124,6 +131,10 @@ class TouchBarController {
             touchBarButton?.image = imageMute
             touchBarButton?.bezelColor = NSColor.red
             setNewVolume(newValue: 0)
+            if let sound = NSSound(named: "Bottle") {
+                sound.play()
+                currentToggleSound = sound
+            }
         }
     }
 }
